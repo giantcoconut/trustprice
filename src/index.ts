@@ -33,6 +33,13 @@ async function start() {
     
     intervalId = setInterval(sendPriceUpdate, POLL_INTERVAL);
 
+    // Keep the Render Web Service awake by pinging itself every 14 minutes
+    setInterval(() => {
+      const url = `http://localhost:${PORT}/`;
+      console.log(`[Keep-Alive] Pinging ${url}`);
+      fetch(url).catch(e => console.error(`[Keep-Alive Error] ${e.message}`));
+    }, 14 * 60 * 1000); // 14 minutes
+
     // Start listening on the port for Render (binding to 0.0.0.0 is crucial)
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`Dummy web server listening on port ${PORT}`);
