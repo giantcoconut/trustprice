@@ -31,18 +31,21 @@ async function start() {
       clearInterval(intervalId);
     }
     
-    intervalId = setInterval(sendPriceUpdate, POLL_INTERVAL);
-
-    // Keep the Render Web Service awake by pinging itself every 14 minutes
-    setInterval(() => {
-      const url = `http://localhost:${PORT}/`;
-      console.log(`[Keep-Alive] Pinging ${url}`);
-      fetch(url).catch(e => console.error(`[Keep-Alive Error] ${e.message}`));
-    }, 14 * 60 * 1000); // 14 minutes
+    intervalId = setInterval(async () => {
+      try {
+        await sendPriceUpdate();
+      } catch (err) {
+        console.error('Polling error:', err);
+      }
+    }, POLL_INTERVAL);
 
     // Start listening on the port for Render (binding to 0.0.0.0 is crucial)
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`Dummy web server listening on port ${PORT}`);
+      console.log('--- PRODUCTION NOTE ---');
+      console.log('To keep the process alive on Render Free Tier, you MUST hit this URL periodically');
+      console.log('from an external service like Cron-job.org or UptimeRobot.');
+      console.log('-----------------------');
     });
   } catch (error) {
     console.error('Failed to start bot:', (error as Error).message);

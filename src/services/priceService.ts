@@ -15,7 +15,7 @@ export interface PriceData {
  */
 export async function getTrustPrice(): Promise<PriceData | null> {
   try {
-    const response = await axios.get(DEXSCREENER_API_URL);
+    const response = await axios.get(DEXSCREENER_API_URL, { timeout: 10000 });
     
     // DexScreener returns pairs matching the token.
     // We get the first pair (usually the most liquid)
